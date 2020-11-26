@@ -1,3 +1,23 @@
 ###> darkanakin41/project-generator
 .idea
 ###< darkanakin41/project-generator
+
+###> gfi-centre-ouest/docker-devbox ###
+/docker-compose.yml
+/*ddb.local.*
+/.bash_enter
+/.bash_leave
+/.certs/api.anchore.test.key
+/.certs/api.anchore.test.crt
+/.certs/.signer.crt
+/.bin/anchore-cli
+/.certs/swagger.anchore.test.key
+/.certs/swagger.anchore.test.crt
+/.docker/node/Dockerfile
+/.bin/conventional-changelog
+/.bin/ncu
+/.bin/npm
+/.bin/vue
+/.certs/ui.anchore.test.key
+/.certs/ui.anchore.test.crt
+###< gfi-centre-ouest/docker-devbox ###

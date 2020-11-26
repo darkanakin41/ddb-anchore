@@ -1,0 +1,46 @@
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & > * {
+    margin-left: .5rem;
+  }
+
+  .v-input__slot {
+    margin: 0;
+  }
+
+  .v-messages {
+    display: none;
+  }
+}
+
+.dockerfile-command {
+  color: #CC7832;
+}
+
+.v-data-table {
+  &.clickable {
+    tr {
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+//header.v-app-bar {
+//  background: rgb(215, 75, 75);
+//  background: linear-gradient(180deg, #a87537 0%, #d74b4b 100%);
+//}
+
+.v-footer {
+  //background: rgb(215, 75, 75);
+  //background: linear-gradient(180deg, #d74b4b 0%, #a87537 100%);
+  height: 48px;
+
+  .col {
+    padding: 0 12px;
+  }
+}

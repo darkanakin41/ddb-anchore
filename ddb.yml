@@ -1,0 +1,10 @@
+copy:
+  specs:
+    - source: .ca-certificates/*.crt
+      destination: .ca-certificates
+      dispatch:
+        - ".docker/*"
+
+core:
+  domain:
+    sub: anchore
