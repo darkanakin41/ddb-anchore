@@ -8,7 +8,7 @@
         <div class="filters">
           <v-text-field placeholder="Rechercher ..."
                         v-model="imageFilter.search"
-                        hide-details />
+                        hide-details/>
           <v-select v-model="imageFilter.registry"
                     :items="registries"
                     clearable
@@ -41,9 +41,9 @@
       <v-data-table
           :headers="headers"
           :items="itemsFiltered"
-          :items-per-page="10"
           :loading="loading"
           :options.sync="options"
+          :footer-props="footerProps"
           class="elevation-1 clickable"
           @click:row="goToDetail($event)"
       >
@@ -94,7 +94,7 @@ export default class ImageList extends Vue {
     await this.loadItems()
   }
 
-  async loadItems(){
+  async loadItems () {
     this.loading = true
     const res = await client.get('images')
     this.items = res.data
@@ -146,6 +146,10 @@ export default class ImageList extends Vue {
     groupDesc: [],
     multiSort: false,
     mustSort: false
+  }
+
+  footerProps = {
+    itemsPerPageOptions: config.app.itemsPerPageTableOptions
   }
 
   async goToDetail (item: Image) {

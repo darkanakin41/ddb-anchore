@@ -26,9 +26,10 @@
                     <tbody>
                     <tr>
                       <td>Image</td>
-                      <td class="font-weight-bold">{{ item.image_detail[0].registry }}/{{
-                          item.image_detail[0].repo
-                        }}:{{ item.image_detail[0].tag }}
+                      <td class="font-weight-bold">
+                        {{ item.image_detail[0].registry }}/{{ item.image_detail[0].repo }}:{{
+                          item.image_detail[0].tag
+                        }}
                       </td>
                       <td>Status</td>
                       <td class="font-weight-bold">{{ imageStatusLabel }}</td>
@@ -98,9 +99,9 @@
             <v-data-table v-if="vulnerabilities"
                           :headers="vulnerabilitiesHeaders"
                           :items="vulnerabilities"
-                          :items-per-page="10"
                           :loading="vulnerabilitiesLoading"
                           :options.sync="vulnerabilitiesOptions"
+                          :footer-props="vulnerabilitiesFooterProps"
                           class="elevation-1"
                           multi-sort
             >
@@ -169,7 +170,7 @@ export default class ImageDetail extends Vue {
     if (this.item && this.item.analysis_status && this.item.analysis_status !== 'analyzed' && this.item.analysis_status !== 'analysis_failed' && !this.autoRefreshInterval) {
       this.autoRefreshInterval = setInterval(() => {
         this.autoRefreshTimerState--
-        if(this.autoRefreshTimerState <= 0){
+        if (this.autoRefreshTimerState <= 0) {
           this.loadItems()
         }
       }, 1000)
@@ -217,9 +218,9 @@ export default class ImageDetail extends Vue {
   vulnerabilitiesLoading: boolean = false
   vulnerabilityResponse: VulnerabilityResponse | null = null
 
-  @Watch('item')
+  @Watch('item', { deep: true })
   async loadVulnerabilities () {
-    if (!this.item || this.item.analysis_status !== 'analysis_failed') {
+    if (!this.item || this.item.analysis_status !== 'analyzed') {
       this.vulnerabilityResponse = null
       return
     }
@@ -342,6 +343,10 @@ export default class ImageDetail extends Vue {
     groupDesc: [],
     multiSort: false,
     mustSort: false
+  }
+
+  vulnerabilitiesFooterProps = {
+    itemsPerPageOptions: config.app.itemsPerPageTableOptions
   }
 }
 </script>

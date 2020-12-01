@@ -28,16 +28,16 @@
       <v-data-table
           :headers="headers"
           :items="itemsFiltered"
-          :items-per-page="10"
           :loading="loading"
           :options.sync="options"
+          :footer-props="footerProps"
           class="elevation-1"
       >
-        <template v-slot:item.active="{ value }">
-          <v-chip color="green" v-if="value">
+        <template v-slot:item.active="{ item, value }">
+          <v-chip color="green" v-if="value" @click="updateActive(item)">
             Oui
           </v-chip>
-          <v-chip color="red" v-else>
+          <v-chip color="red" v-else @click="updateActive(item)">
             Non
           </v-chip>
         </template>
@@ -50,9 +50,22 @@
         <template v-slot:item.last_updated="{ value }">
           {{ formatDate(value) }}
         </template>
+        <template v-slot:item.actions="{ item }">
+          <v-btn icon @click="openItemDeleteDialog(item)">
+            <v-icon>mdi-delete-outline</v-icon>
+          </v-btn>
+        </template>
       </v-data-table>
     </page-card>
     <subscription-creation :open.sync="creationDialog" @done="loadItems"/>
+    <validation-dialog v-model="itemDeleteDialog" @confirmed="confirmDeleteItem()">
+      <template v-slot:title>
+        Supprimer
+      </template>
+      Attention, vous êtes sur le point de supprimer le client <b>{{ (item || { name: '' }).name }}</b>
+      <br/>
+      Cette action est définitive. Êtes-vous sûre de vouloir réaliser cette action ?
+    </validation-dialog>
   </div>
 </template>
 
@@ -68,15 +81,19 @@ import { formatDateTimeShort } from '@/utils/date'
 import PageCard from '@/components/Layout/PageCard.vue'
 import Subscription from '@/model/Subscription'
 import SubscriptionCreation from '@/components/Dialog/SubscriptionCreation.vue'
+import ValidationDialog from '@/components/Dialog/ValidationDialog.vue'
 
 @Component({
-  components: { SubscriptionCreation, PageCard }
+  components: { ValidationDialog, SubscriptionCreation, PageCard }
 })
 export default class SubscriptionList extends Vue {
   items: Subscription[] = []
   loading: boolean = false
 
   creationDialog: boolean = false
+
+  item: Subscription | null = null
+  itemDeleteDialog: boolean = false
 
   async mounted () {
     await this.loadItems()
@@ -95,7 +112,8 @@ export default class SubscriptionList extends Vue {
       { text: 'Type', value: 'subscription_type' },
       { text: 'Créé le', value: 'created_at' },
       { text: 'Mis à jour le', value: 'last_updated' },
-      { text: 'Actif', value: 'active' }
+      { text: 'Actif', value: 'active' },
+      { text: 'Actions', value: 'actions' }
     ]
   }
 
@@ -114,6 +132,10 @@ export default class SubscriptionList extends Vue {
     groupDesc: [],
     multiSort: false,
     mustSort: false
+  }
+
+  footerProps = {
+    itemsPerPageOptions: config.app.itemsPerPageTableOptions
   }
 
   subscriptionFilter = {
@@ -137,6 +159,35 @@ export default class SubscriptionList extends Vue {
       }
       return !(this.subscriptionFilter.search.trim().length > 0 && item.subscription_key.toLowerCase().indexOf(this.subscriptionFilter.search.trim().toLowerCase()) === -1)
     })
+  }
+
+  async updateActive (item: Subscription) {
+    item.active = !item.active
+    try {
+      await client.put(`subscriptions/${item.subscription_id}`, { active: item.active })
+    } catch (e) {
+      item.active = !item.active
+    }
+  }
+
+  openItemDeleteDialog (item: Subscription) {
+    this.item = item
+    this.itemDeleteDialog = true
+  }
+
+  async confirmDeleteItem () {
+    if (!this.item) {
+      return
+    }
+    try {
+      this.loading = true
+      await client.delete(`subscriptions/${this.item.subscription_id}`)
+    } catch (e) {
+    }
+
+    await this.loadItems()
+    this.loading = false
+    this.itemDeleteDialog = false
   }
 }
 </script>

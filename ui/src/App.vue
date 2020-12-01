@@ -45,7 +45,7 @@ export default class App extends Vue {
     {
       label: 'Images',
       to: { name: 'image-list' }
-    },
+    }
   ]
 }
 </script>
