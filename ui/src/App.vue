@@ -39,9 +39,13 @@ import ViewContainer from '@/components/Layout/ViewContainer.vue'
 export default class App extends Vue {
   appBarLinks: { label: string, to: RawLocation }[] = [
     {
+      label: 'Abonnements',
+      to: { name: 'subscription-list' }
+    },
+    {
       label: 'Images',
       to: { name: 'image-list' }
-    }
+    },
   ]
 }
 </script>

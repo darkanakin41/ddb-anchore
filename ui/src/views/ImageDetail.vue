@@ -11,6 +11,14 @@
               <v-chip>{{ analysisStatusLabel }}</v-chip>
               {{ item.image_detail[0].repo }}
             </template>
+            <template v-slot:toolbar-actions>
+              <template v-if="autoRefreshInterval">
+                Rafraichissement auto dans {{ autoRefreshTimerState }}s
+              </template>
+              <v-btn icon @click="loadItems">
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+            </template>
             <v-container fluid>
               <v-row>
                 <v-col cols="12">
@@ -82,6 +90,9 @@
                           label="Sévérité"
                           v-if="severities.length > 1"/>
                 <v-checkbox v-model="vulnerabilityFilter.haveFix" label="Corrigeable"></v-checkbox>
+                <v-btn icon @click="loadVulnerabilities">
+                  <v-icon>mdi-refresh</v-icon>
+                </v-btn>
               </div>
             </template>
             <v-data-table v-if="vulnerabilities"
@@ -141,11 +152,28 @@ export default class ImageDetail extends Vue {
   item: Image | null = null
   loading: boolean = false
 
+  autoRefreshInterval: number | null = null
+  autoRefreshTimerInitial: number = 30
+  autoRefreshTimerState: number = 0
+
   async mounted () {
+    await this.loadItems()
+  }
+
+  async loadItems () {
     this.loading = true
     const res = await client.get(`images/by_id/${this.id}`)
     this.item = res.data[0]
     this.loading = false
+    this.autoRefreshTimerState = this.autoRefreshTimerInitial
+    if (this.item && this.item.analysis_status && this.item.analysis_status !== 'analyzed' && this.item.analysis_status !== 'analysis_failed' && !this.autoRefreshInterval) {
+      this.autoRefreshInterval = setInterval(() => {
+        this.autoRefreshTimerState--
+        if(this.autoRefreshTimerState <= 0){
+          this.loadItems()
+        }
+      }, 1000)
+    }
   }
 
   get imageStatusLabel () {
@@ -191,15 +219,19 @@ export default class ImageDetail extends Vue {
 
   @Watch('item')
   async loadVulnerabilities () {
-    this.vulnerabilitiesLoading = true
-    if (!this.item) {
+    if (!this.item || this.item.analysis_status !== 'analysis_failed') {
+      this.vulnerabilityResponse = null
       return
     }
-
-    const res = await client.get(`images/by_id/${this.id}/vuln/all`)
-    this.vulnerabilityResponse = res.data
-
-    this.vulnerabilitiesLoading = false
+    this.vulnerabilitiesLoading = true
+    try {
+      const res = await client.get(`images/by_id/${this.id}/vuln/all`)
+      this.vulnerabilityResponse = res.data
+    } catch (e) {
+      this.vulnerabilityResponse = null
+    } finally {
+      this.vulnerabilitiesLoading = false
+    }
   }
 
   get vulnerabilities (): Vulnerability[] {

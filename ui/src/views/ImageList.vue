@@ -33,6 +33,9 @@
                     item-value="code"
                     label="Analyse"
                     v-if="analysisStatus.length > 1"/>
+          <v-btn icon @click="loadItems">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
         </div>
       </template>
       <v-data-table
@@ -83,11 +86,15 @@ import PageCard from '@/components/Layout/PageCard.vue'
 @Component({
   components: { PageCard }
 })
-export default class Images extends Vue {
+export default class ImageList extends Vue {
   items: Image[] = []
   loading: boolean = false
 
   async mounted () {
+    await this.loadItems()
+  }
+
+  async loadItems(){
     this.loading = true
     const res = await client.get('images')
     this.items = res.data

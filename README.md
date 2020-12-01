@@ -21,12 +21,3 @@ anchore-cli image content <your-image> # Image content
 anchore-cli image vuln <your-image> all # Image vulnerabilities
 anchore-cli evaluate check <your-image> # Evaluate image security
 ```
-
-
-anchore-cli image del docker.io/nginx:1.14-alpine-perl 
-anchore-cli image del docker.io/nginx:1.15.3-perl 
-anchore-cli image del docker.io/nginx:1.17.10-alpine 
-anchore-cli image del docker.io/nginx:1.17.2-alpine 
-anchore-cli image del docker.io/nginx:1.17.4-alpine-perl 
-anchore-cli image del docker.io/nginx:1.9.6 
-anchore-cli image del docker.io/nginx:alpine-perl

@@ -9,6 +9,11 @@ function injectId (route: Route) {
 
 const routes: Array<RouteConfig> = [
   {
+    path: '/subscription/list',
+    name: 'subscription-list',
+    component: () => import('@/views/SubscriptionList.vue')
+  },
+  {
     path: '/image/list',
     name: 'image-list',
     component: () => import('@/views/ImageList.vue')

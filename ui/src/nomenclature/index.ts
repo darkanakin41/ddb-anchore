@@ -46,3 +46,26 @@ export const IMAGE_STATUS: _Nomenclature[] = [
     label: 'Désactivée'
   }
 ]
+
+export const SUBSCRIPTION_TYPE: _Nomenclature[] = [
+  {
+    code: 'analysis_update',
+    label: 'Analyse'
+  },
+  {
+    code: 'repo_update',
+    label: 'Dépôt'
+  },
+  {
+    code: 'policy_eval',
+    label: 'Police'
+  },
+  {
+    code: 'tag_update',
+    label: 'Tag'
+  },
+  {
+    code: 'vuln_update',
+    label: 'Vulnérabilité'
+  }
+]
