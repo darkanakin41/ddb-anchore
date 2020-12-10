@@ -11,11 +11,14 @@ Also, a GUI have been developed in order to manage repository and display securi
 
 ![UI ScreenShot](./doc/assets/ui.png)
 
-It is still under development, but the basic functionalities are in. 
+It is still under development, but the basic functionalities are in :
+* Registry management (with authentification)
+* Subscription management (which docker image/repository is watched with witch policy)
+* Image analysis list
+* Image analysis detail
 
 ## TODO
 * Add an authentification system
-* Add registry management
 * Build an image with sources compiled
 
 # Useful commands

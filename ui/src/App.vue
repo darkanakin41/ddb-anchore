@@ -45,6 +45,10 @@ export default class App extends Vue {
     {
       label: 'Images',
       to: { name: 'image-list' }
+    },
+    {
+      label: 'Registries',
+      to: { name: 'registry-list' }
     }
   ]
 }

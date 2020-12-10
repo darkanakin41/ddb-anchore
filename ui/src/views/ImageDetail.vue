@@ -39,10 +39,8 @@
                     <tr>
                       <td>Créer le</td>
                       <td class="font-weight-bold">{{ formatDate(item.image_detail[0].created_at) }}</td>
-                      <td></td>
-                      <td class="font-weight-bold"></td>
-                      <td></td>
-                      <td class="font-weight-bold"></td>
+                      <td>Digest</td>
+                      <td class="font-weight-bold" colspan="3">{{ item.imageDigest }}</td>
                     </tr>
                     <tr>
                       <td>OS</td>

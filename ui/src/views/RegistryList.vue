@@ -2,25 +2,24 @@
   <div id="subscription-list">
     <page-card :body-padding="false">
       <template v-slot:title>
-        Abonnements
+        Registries
       </template>
       <template v-slot:toolbar-actions>
         <div class="filters">
           <v-text-field placeholder="Rechercher ..."
-                        v-model="subscriptionFilter.search"
+                        v-model="registryFilter.search"
                         hide-details/>
-          <v-select v-model="subscriptionFilter.type"
-                    :items="subscriptionType"
-                    clearable
-                    hide-details
-                    item-text="label"
-                    item-value="code"
-                    label="Type"/>
-          <v-checkbox v-model="subscriptionFilter.active" label="Actif"></v-checkbox>
+          <!--          <v-select v-model="registryFilter.type"-->
+          <!--                    :items="subscriptionType"-->
+          <!--                    clearable-->
+          <!--                    hide-details-->
+          <!--                    item-text="label"-->
+          <!--                    item-value="code"-->
+          <!--                    label="Type"/>-->
           <v-btn icon @click="loadItems">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
-          <v-btn icon @click="creationDialog=true">
+          <v-btn icon @click="openCreationDialog()">
             <v-icon>mdi-plus-circle-outline</v-icon>
           </v-btn>
         </div>
@@ -33,16 +32,13 @@
           :footer-props="footerProps"
           class="elevation-1"
       >
-        <template v-slot:item.active="{ item, value }">
-          <v-chip color="green" v-if="value" @click="updateActive(item)">
+        <template v-slot:item.registry_verify="{ value }">
+          <v-chip color="green" v-if="value">
             Oui
           </v-chip>
-          <v-chip color="red" v-else @click="updateActive(item)">
+          <v-chip color="red" v-else>
             Non
           </v-chip>
-        </template>
-        <template v-slot:item.subscription_type="{ value }">
-          {{ getSubscriptionTypeLabel(value) }}
         </template>
         <template v-slot:item.created_at="{ value }">
           {{ formatDate(value) }}
@@ -57,12 +53,12 @@
         </template>
       </v-data-table>
     </page-card>
-    <subscription-creation :open.sync="creationDialog" @done="loadItems"/>
+    <registry-creation :open.sync="creationDialog" :item="item" @done="loadItems"/>
     <validation-dialog v-model="itemDeleteDialog" @confirmed="confirmDeleteItem()">
       <template v-slot:title>
         Supprimer
       </template>
-      Attention, vous êtes sur le point de supprimer l'abonnement <b>{{ (item || { subscription_key: '' }).subscription_key }}</b>
+      Attention, vous êtes sur le point de supprimer la registry <b>{{ (item || { registry: '' }).registry }}</b>
       <br/>
       Cette action est définitive. Êtes-vous sûre de vouloir réaliser cette action ?
     </validation-dialog>
@@ -72,53 +68,58 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { client } from '@/service/axios'
-import Image from '@/model/Image'
-import { DataOptions } from 'vuetify'
+import { DataOptions, DataTableHeader } from 'vuetify'
 import config from '@/config'
-import _Nomenclature, { ANALYSIS_STATUS, getNomenclatureLabel, IMAGE_STATUS, SUBSCRIPTION_TYPE } from '@/nomenclature'
-import getReadableFileSizeString from '@/utils/file'
 import { formatDateTimeShort } from '@/utils/date'
 import PageCard from '@/components/Layout/PageCard.vue'
-import Subscription from '@/model/Subscription'
-import SubscriptionCreation from '@/components/Dialog/SubscriptionCreation.vue'
 import ValidationDialog from '@/components/Dialog/ValidationDialog.vue'
+import RegistryConfiguration from '@/model/RegistryConfiguration'
+import RegistryCreation from '@/components/Dialog/RegistryCreation.vue'
+import RegistryConfigurationRequest from '@/model/Request/RegistryConfigurationRequest'
 
 @Component({
-  components: { ValidationDialog, SubscriptionCreation, PageCard }
+  components: { RegistryCreation, ValidationDialog, PageCard }
 })
-export default class SubscriptionList extends Vue {
-  items: Subscription[] = []
+export default class RegistryList extends Vue {
+  items: RegistryConfiguration[] = []
   loading: boolean = false
 
   creationDialog: boolean = false
-
-  item: Subscription | null = null
   itemDeleteDialog: boolean = false
+  item: RegistryConfigurationRequest | RegistryConfiguration = this.getNewItem()
 
-  async mounted () {
+  async mounted (): Promise<void> {
     await this.loadItems()
   }
 
-  async loadItems () {
+  async loadItems (): Promise<void> {
     this.loading = true
-    const res = await client.get('subscriptions')
+    const res = await client.get('registries')
     this.items = res.data
     this.loading = false
   }
 
-  get headers () {
-    return [
-      { text: 'Image', value: 'subscription_key' },
-      { text: 'Type', value: 'subscription_type' },
-      { text: 'Créé le', value: 'created_at' },
-      { text: 'Mis à jour le', value: 'last_updated' },
-      { text: 'Actif', value: 'active' },
-      { text: 'Actions', value: 'actions' }
-    ]
+  getNewItem (): RegistryConfigurationRequest {
+    return {
+      registry: '',
+      registry_name: '',
+      registry_pass: '',
+      registry_type: 'docker_v2',
+      registry_user: '',
+      registry_verify: true
+    }
   }
 
-  getSubscriptionTypeLabel (value: string) {
-    return getNomenclatureLabel(SUBSCRIPTION_TYPE, value)
+  get headers (): DataTableHeader[] {
+    return [
+      { text: 'Nom', value: 'registry_name' },
+      { text: 'Type', value: 'registry_type' },
+      { text: 'Host', value: 'registry' },
+      { text: 'SSL/TLS Verification', value: 'registry_verify' },
+      { text: 'Créé le', value: 'created_at' },
+      { text: 'Mis à jour le', value: 'last_updated' },
+      { text: 'Actions', value: 'actions' }
+    ]
   }
 
   formatDate = formatDateTimeShort
@@ -126,7 +127,7 @@ export default class SubscriptionList extends Vue {
   options: DataOptions = {
     page: 1,
     itemsPerPage: config.app.itemsPerPageTableOptions[0],
-    sortBy: ['subscription_key'],
+    sortBy: ['registry_name'],
     sortDesc: [false],
     groupBy: [],
     groupDesc: [],
@@ -138,50 +139,40 @@ export default class SubscriptionList extends Vue {
     itemsPerPageOptions: config.app.itemsPerPageTableOptions
   }
 
-  subscriptionFilter = {
+  registryFilter = {
     type: null,
-    active: false,
     search: ''
   }
 
-  subscriptionType = SUBSCRIPTION_TYPE
-
-  get itemsFiltered () {
+  get itemsFiltered (): RegistryConfiguration[] {
     if (!this.items) {
       return []
     }
-    return this.items.filter((item: Subscription) => {
-      if (this.subscriptionFilter.type && item.subscription_type !== this.subscriptionFilter.type) {
-        return false
-      }
-      if (this.subscriptionFilter.active && !item.active) {
-        return false
-      }
-      return !(this.subscriptionFilter.search.trim().length > 0 && item.subscription_key.toLowerCase().indexOf(this.subscriptionFilter.search.trim().toLowerCase()) === -1)
+    return this.items.filter((item: RegistryConfiguration) => {
+      // if (this.registryFilter.type && item.subscription_type !== this.registryFilter.type) {
+      //   return false
+      // }
+      return !(this.registryFilter.search.trim().length > 0 && item.registry_name.toLowerCase().indexOf(this.registryFilter.search.trim().toLowerCase()) === -1)
     })
   }
 
-  async updateActive (item: Subscription) {
-    item.active = !item.active
-    try {
-      await client.put(`subscriptions/${item.subscription_id}`, { active: item.active })
-    } catch (e) {
-      item.active = !item.active
-    }
+  openCreationDialog () {
+    this.item = this.getNewItem()
+    this.creationDialog = true
   }
 
-  openItemDeleteDialog (item: Subscription) {
+  openItemDeleteDialog (item: RegistryConfiguration): void {
     this.item = item
     this.itemDeleteDialog = true
   }
 
-  async confirmDeleteItem () {
+  async confirmDeleteItem (): Promise<void> {
     if (!this.item) {
       return
     }
     try {
       this.loading = true
-      await client.delete(`subscriptions/${this.item.subscription_id}`)
+      await client.delete(`registries/${this.item.registry}`)
     } catch (e) {
     }
 

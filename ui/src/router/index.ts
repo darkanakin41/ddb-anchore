@@ -25,6 +25,12 @@ const routes: Array<RouteConfig> = [
     props: injectId
   },
   {
+    path: '/registry/list',
+    name: 'registry-list',
+    component: () => import('@/views/RegistryList.vue'),
+    props: injectId
+  },
+  {
     path: '*',
     redirect: { name: 'image-list' }
   }
