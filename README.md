@@ -17,6 +17,14 @@ It is still under development, but the basic functionalities are in :
 * Image analysis list
 * Image analysis detail
 
+# A Dockerfile Linter : hadolint
+[hadolint](https://github.com/hadolint/hadolint) is a static Dockerfile linter which.
+
+In order to use it everywhere, you can run the following command :
+```shell
+ln -fs $(pwd)/bin/hadolint ~/.docker-devbox/bin
+```
+
 ## TODO
 * Add an authentification system
 * Build an image with sources compiled
@@ -42,3 +50,10 @@ anchore-cli image vuln <your-image> all # Image vulnerabilities
 anchore-cli evaluate check <your-image> # Evaluate image security
 ```
 
+Analyse locally built images
+```shell
+curl -o inline_scan.sh https://ci-tools.anchore.io/inline_scan-v0.5.0
+chmod +x inline_scan.sh
+
+./inline_scan.sh analyze -g -r http://api.anchore.test/v1 -u admin -p foobar -f .docker/<image>/Dockerfile <image tag>
+```

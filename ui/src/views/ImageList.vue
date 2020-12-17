@@ -140,8 +140,8 @@ export default class ImageList extends Vue {
   options: DataOptions = {
     page: 1,
     itemsPerPage: config.app.itemsPerPageTableOptions[0],
-    sortBy: ['image_detail[0].repo'],
-    sortDesc: [false],
+    sortBy: ['image_detail[0].created_at'],
+    sortDesc: [true],
     groupBy: [],
     groupDesc: [],
     multiSort: false,

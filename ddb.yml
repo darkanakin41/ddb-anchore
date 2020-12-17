@@ -5,6 +5,10 @@ copy:
       dispatch:
         - ".docker/*"
 
+permissions:
+  specs:
+    "bin/hadolint": "+x"
+
 core:
   domain:
     sub: anchore

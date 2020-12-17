@@ -20,4 +20,5 @@
 /.bin/vue
 /.certs/ui.anchore.test.key
 /.certs/ui.anchore.test.crt
+/bin/hadolint
 ###< gfi-centre-ouest/docker-devbox ###
