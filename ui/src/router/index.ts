@@ -3,8 +3,14 @@ import VueRouter, { Route, RouteConfig } from 'vue-router'
 
 Vue.use(VueRouter)
 
-function injectId (route: Route) {
-  return { id: route.params.id }
+function inject (fields: string[]) {
+  return (route:Route) => {
+    const params: { [key: string]: string } = {}
+    fields.forEach((field) => {
+      params[field] = route.params[field]
+    })
+    return params
+  }
 }
 
 const routes: Array<RouteConfig> = [
@@ -22,13 +28,24 @@ const routes: Array<RouteConfig> = [
     path: '/image/:id',
     name: 'image-view',
     component: () => import('@/views/ImageDetail.vue'),
-    props: injectId
+    props: inject(['id'])
+  },
+  {
+    path: '/account/list',
+    name: 'account-list',
+    component: () => import('@/views/AccountList.vue'),
+  },
+  {
+    path: '/account/:name',
+    name: 'account-view',
+    component: () => import('@/views/AccountDetail.vue'),
+    props: inject(['name'])
   },
   {
     path: '/registry/list',
     name: 'registry-list',
     component: () => import('@/views/RegistryList.vue'),
-    props: injectId
+    props: inject(['id'])
   },
   {
     path: '*',

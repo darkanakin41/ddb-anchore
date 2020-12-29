@@ -149,9 +149,6 @@ export default class RegistryList extends Vue {
       return []
     }
     return this.items.filter((item: RegistryConfiguration) => {
-      // if (this.registryFilter.type && item.subscription_type !== this.registryFilter.type) {
-      //   return false
-      // }
       return !(this.registryFilter.search.trim().length > 0 && item.registry_name.toLowerCase().indexOf(this.registryFilter.search.trim().toLowerCase()) === -1)
     })
   }

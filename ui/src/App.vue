@@ -43,6 +43,10 @@ export default class App extends Vue {
       to: { name: 'subscription-list' }
     },
     {
+      label: 'Comptes',
+      to: { name: 'account-list' }
+    },
+    {
       label: 'Images',
       to: { name: 'image-list' }
     },

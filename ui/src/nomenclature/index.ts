@@ -69,3 +69,48 @@ export const SUBSCRIPTION_TYPE: _Nomenclature[] = [
     label: 'Vulnérabilité'
   }
 ]
+
+export const ACCOUNT_STATE: _Nomenclature[] = [
+  {
+    code: 'enabled',
+    label: 'Actif'
+  },
+  {
+    code: 'disabled',
+    label: 'Désactivé'
+  },
+  {
+    code: 'deleting',
+    label: 'En cours de suppression'
+  }
+]
+
+export const ACCOUNT_TYPE: _Nomenclature[] = [
+  {
+    code: 'user',
+    label: 'Utilisateur'
+  },
+  {
+    code: 'admin',
+    label: 'Admin'
+  },
+  {
+    code: 'service',
+    label: 'Compte de service'
+  }
+]
+
+export const USER_TYPE: _Nomenclature[] = [
+  {
+    code: 'native',
+    label: 'Natif'
+  },
+  {
+    code: 'internal',
+    label: 'Interne'
+  },
+  {
+    code: 'external',
+    label: 'Externe'
+  }
+]
