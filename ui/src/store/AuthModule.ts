@@ -106,7 +106,7 @@ export default class AuthModule extends VuexModule {
   async login (token: string) {
     this.setToken(token)
 
-    this.setUser((await AuthentificationApi.getUserData()).data) //TODO
+    this.setUser((await AuthentificationApi.getUserData()).data)
 
     localStorage.setItem('token', token)
 
