@@ -1,10 +1,12 @@
 import Vue from 'vue'
-import VueRouter, { Route, RouteConfig } from 'vue-router'
+import VueRouter, { RawLocation, Route, RouteConfig } from 'vue-router'
+import { auth, init } from '@/store/modules'
+import hydrateStore from '@/store/hydrate'
 
 Vue.use(VueRouter)
 
 function inject (fields: string[]) {
-  return (route:Route) => {
+  return (route: Route) => {
     const params: { [key: string]: string } = {}
     fields.forEach((field) => {
       params[field] = route.params[field]
@@ -14,6 +16,21 @@ function inject (fields: string[]) {
 }
 
 const routes: Array<RouteConfig> = [
+  {
+    path: '/security/login',
+    name: 'security-login',
+    component: () => import('@/views/Security/Login.vue'),
+    meta:{
+      access:{
+        allowAnonymous: true
+      }
+    }
+  },
+  {
+    path: '/security/logout',
+    name: 'security-logout',
+    component: () => import('@/views/Security/Logout.vue')
+  },
   {
     path: '/subscription/list',
     name: 'subscription-list',
@@ -33,7 +50,7 @@ const routes: Array<RouteConfig> = [
   {
     path: '/account/list',
     name: 'account-list',
-    component: () => import('@/views/AccountList.vue'),
+    component: () => import('@/views/AccountList.vue')
   },
   {
     path: '/account/:name',
@@ -57,6 +74,29 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach(async (to: Route, from: Route, next: (to?: RawLocation | false | ((vm: Vue) => any) | void) => void) => {
+  try {
+    await auth.tryGetUser()
+    if (to.meta.access && to.meta.access.allowAnonymous) {
+      return next()
+    } else if (!auth.authenticated) {
+      return next({ name: 'security-login' })
+    }
+    if (!init.hydrated && !init.hydrating) {
+      await hydrateStore()
+    }
+
+    // if (!init.hydrated && !init.hydrating) {
+    //   hydrateStore().then(() => checkRolesCb(to, from, next)).catch(() => next(false))
+    // } else {
+    //   checkRolesCb(to, from, next)
+    // }
+    return next()
+  } catch (e) {
+    return next({ name: 'security-login' })
+  }
 })
 
 export default router

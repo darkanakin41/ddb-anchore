@@ -32,28 +32,39 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { RawLocation } from 'vue-router'
 import ViewContainer from '@/components/Layout/ViewContainer.vue'
+import { auth } from '@/store/modules'
 
 @Component({
   components: { ViewContainer }
 })
 export default class App extends Vue {
-  appBarLinks: { label: string, to: RawLocation }[] = [
-    {
-      label: 'Abonnements',
-      to: { name: 'subscription-list' }
-    },
-    {
-      label: 'Comptes',
-      to: { name: 'account-list' }
-    },
-    {
-      label: 'Images',
-      to: { name: 'image-list' }
-    },
-    {
-      label: 'Registries',
-      to: { name: 'registry-list' }
+  get appBarLinks (): { label?: string, icon?: string, to: RawLocation }[] {
+    if (!auth.authenticated || !auth.user) {
+      return []
     }
-  ]
+    return [
+      {
+        label: 'Abonnements',
+        to: { name: 'subscription-list' }
+      },
+      {
+        label: 'Comptes',
+        to: { name: 'account-list' }
+      },
+      {
+        label: 'Images',
+        to: { name: 'image-list' }
+      },
+      {
+        label: 'Registries',
+        to: { name: 'registry-list' }
+      },
+      {
+        label: auth.user.name,
+        icon: 'mdi-logout-variant',
+        to: { name: 'security-logout' }
+      }
+    ]
+  }
 }
 </script>

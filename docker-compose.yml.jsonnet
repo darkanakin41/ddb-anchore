@@ -7,6 +7,7 @@ local domain = std.join('.', [std.extVar("core.domain.sub"), std.extVar("core.do
 local port_prefix = std.extVar("docker.port_prefix");
 
 local app_workdir = "/app";
+local anchore_auth_secret = 'ddbanchoreisgreat';
 
 local prefix_port(port, output_port = null)= [port_prefix + (if output_port == null then std.substr(port, std.length(port) - 2, 2) else output_port) + ":" + port];
 
@@ -30,6 +31,8 @@ ddb.Compose() {
 		        depends_on: ['db','catalog'],
 		        environment: {
 		            ANCHORE_ENDPOINT_HOSTNAME: 'analyzer',
+		            ANCHORE_OAUTH_ENABLED: 'true',
+		            ANCHORE_AUTH_SECRET: anchore_auth_secret,
 		            ANCHORE_DB_HOST: 'db',
 		            ANCHORE_DB_PASSWORD: db_password,
 		        },
@@ -40,6 +43,8 @@ ddb.Compose() {
 		        depends_on: ['db','catalog'],
 		        environment: {
 		            ANCHORE_ENDPOINT_HOSTNAME: 'policy-engine',
+		            ANCHORE_OAUTH_ENABLED: 'true',
+		            ANCHORE_AUTH_SECRET: anchore_auth_secret,
 		            ANCHORE_DB_HOST: 'db',
 		            ANCHORE_DB_PASSWORD: db_password,
 		        },
@@ -50,6 +55,8 @@ ddb.Compose() {
 		        depends_on: ['db','catalog'],
 		        environment: {
 		            ANCHORE_ENDPOINT_HOSTNAME: 'queue',
+		            ANCHORE_OAUTH_ENABLED: 'true',
+		            ANCHORE_AUTH_SECRET: anchore_auth_secret,
 		            ANCHORE_DB_HOST: 'db',
 		            ANCHORE_DB_PASSWORD: db_password,
 		        }
@@ -60,6 +67,8 @@ ddb.Compose() {
 		        depends_on: ['db'],
 		        environment: {
 		            ANCHORE_ENDPOINT_HOSTNAME: 'catalog',
+		            ANCHORE_OAUTH_ENABLED: 'true',
+		            ANCHORE_AUTH_SECRET: anchore_auth_secret,
 		            ANCHORE_DB_HOST: 'db',
 		            ANCHORE_DB_PASSWORD: db_password,
 		        },
@@ -74,6 +83,8 @@ ddb.Compose() {
 		            ANCHORE_ENDPOINT_HOSTNAME: 'queue',
 		            ANCHORE_DB_HOST: 'db',
 		            ANCHORE_DB_PASSWORD: db_password,
+		            ANCHORE_AUTH_SECRET: anchore_auth_secret,
+		            ANCHORE_OAUTH_ENABLED: 'true',
 		            ANCHORE_CLI_USER: 'admin',
 		            ANCHORE_CLI_PASS: 'foobar',
 		            ANCHORE_CLI_URL: "http://" + std.join(".", ["api", domain]) + "/v1/",

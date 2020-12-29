@@ -76,7 +76,9 @@ export default class ImageDetail extends Vue {
   }
 
   async updateState () {
-    await AccountsApi.updateState(this.item)
+    if(this.item){
+      await AccountsApi.updateState(this.item)
+    }
   }
 
 }

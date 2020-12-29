@@ -13,11 +13,7 @@ export interface Config {
 
 const config: Config = {
   api: {
-    baseURL: 'https://swagger.{{core.domain.sub}}.{{core.domain.ext}}/v1',
-    auth: {
-      username: 'admin',
-      password: 'foobar'
-    }
+    baseURL: 'https://swagger.{{core.domain.sub}}.{{core.domain.ext}}/v1'
   },
   app: {
     itemsPerPageTableOptions: [10, 20, 30],

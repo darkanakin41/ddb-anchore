@@ -10,8 +10,12 @@
              v-bind:key="link.label"
              :to="link.to"
              :exact="true"
-             class="ml-2" color="primary">
-        {{ link.label }}
+             class="ml-2" color="primary"
+      >
+        <v-icon v-if="link.icon">{{ link.icon }}</v-icon>
+        <template v-if="link.label">
+          {{ link.label }}
+        </template>
       </v-btn>
 
     </v-app-bar>
@@ -34,6 +38,6 @@ import { RawLocation } from 'vue-router'
 })
 export default class ViewContainer extends Vue {
   @Prop({ type: Array, default: () => [] })
-  appBarLinks: { label: string, to: RawLocation }[]
+  appBarLinks: { label?: string, icon?: string, to: RawLocation }[]
 }
 </script>

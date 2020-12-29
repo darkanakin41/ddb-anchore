@@ -36,6 +36,12 @@
     "tests/**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "**/dist",
+    "**/*.d.ts",
+    "node_modules",
+    "**/node_modules",
+    "**/*.spec.ts",
+    "**/__tests__",
+    "**/*.test.ts"
   ]
 }
