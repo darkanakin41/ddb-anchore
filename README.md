@@ -26,7 +26,6 @@ ln -fs $(pwd)/bin/hadolint ~/.docker-devbox/bin
 ```
 
 ## TODO
-* Add an authentification system
 * Build an image with sources compiled
 
 # Useful commands
