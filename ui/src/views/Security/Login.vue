@@ -66,7 +66,7 @@ export default class Login extends Vue {
       this.success = true
 
       setTimeout(async () => {
-        await this.$router.push({ name: 'home' })
+        await this.$router.push({ name: 'image-list' })
       }, 5000)
     } catch (e) {
       this.error = 'Couple identifiant/mot de passe invalide'

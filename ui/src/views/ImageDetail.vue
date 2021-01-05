@@ -16,6 +16,9 @@
               <template v-if="autoRefreshInterval">
                 Rafraichissement auto dans {{ autoRefreshTimerState }}s
               </template>
+              <v-btn icon @click="deleteImage" v-if="">
+                <v-icon>mdi-delete-outline</v-icon>
+              </v-btn>
               <v-btn icon @click="exportPdf">
                 <v-icon>mdi-file-pdf-outline</v-icon>
               </v-btn>
@@ -372,6 +375,7 @@ import NvdData from '@/model/NvdData'
 import ContentPackageResponse from '@/model/ContentPackageResponse'
 import ContentPackage from '@/model/ContentPackage'
 import VueHtml2pdf from 'vue-html2pdf'
+import ImagesApi from '@/service/api/ImagesApi'
 
 @Component({
   components: { PageCard, VueHtml2pdf }
@@ -400,18 +404,22 @@ export default class ImageDetail extends Vue {
   }
 
   async loadItems () {
-    this.loading = true
-    const res = await client.get(`images/by_id/${this.id}`)
-    this.item = res.data[0]
-    this.loading = false
-    this.autoRefreshTimerState = this.autoRefreshTimerInitial
-    if (this.item && this.item.analysis_status && this.item.analysis_status !== 'analyzed' && this.item.analysis_status !== 'analysis_failed' && !this.autoRefreshInterval) {
-      this.autoRefreshInterval = setInterval(() => {
-        this.autoRefreshTimerState--
-        if (this.autoRefreshTimerState <= 0) {
-          this.loadItems()
-        }
-      }, 1000)
+    try {
+      this.loading = true
+      const res = await ImagesApi.get(this.id)
+      this.item = res.data[0]
+      this.loading = false
+      this.autoRefreshTimerState = this.autoRefreshTimerInitial
+      if (this.item && this.item.analysis_status && this.item.analysis_status !== 'analyzed' && this.item.analysis_status !== 'analysis_failed' && !this.autoRefreshInterval) {
+        this.autoRefreshInterval = setInterval(() => {
+          this.autoRefreshTimerState--
+          if (this.autoRefreshTimerState <= 0) {
+            this.loadItems()
+          }
+        }, 1000)
+      }
+    } catch (e) {
+      return await this.$router.push({ name: 'image-list' })
     }
   }
 
@@ -690,6 +698,15 @@ export default class ImageDetail extends Vue {
     } finally {
       this.packagesLoading = false
     }
+  }
+
+  async deleteImage (): Promise<void> {
+    if (!this.item) {
+      return
+    }
+
+    const res = await ImagesApi.delete(this.id)
+    await this.mounted()
   }
 
   get packages (): ContentPackage[] {
