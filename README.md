@@ -26,6 +26,8 @@ ln -fs $(pwd)/bin/hadolint ~/.docker-devbox/bin
 ```
 
 ## TODO
+* Add snackbars for confirmations and errors
+* Build a dashboard
 * Build an image with sources compiled
 
 # Useful commands

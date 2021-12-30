@@ -32,7 +32,7 @@
         {{ formatDate(value) }}
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn icon @click="openDeleteDialog(item)">
+        <v-btn icon @click="openDeleteDialog(item)" v-if="items.length > 1">
           <v-icon>mdi-delete-outline</v-icon>
         </v-btn>
       </template>
@@ -61,6 +61,7 @@ import UserCreationDialog from '@/components/Dialog/UserCreationDialog.vue'
 import UserCreationRequest from '@/model/Request/UserCreationRequest'
 import ValidationDialog from '@/components/Dialog/ValidationDialog.vue'
 import AccountsApi from '@/service/api/AccountsApi'
+import Account from '@/model/Account'
 
 @Component({
   components: { ValidationDialog, UserCreationDialog, PageCard }
@@ -104,8 +105,7 @@ export default class UserDataTable extends Vue {
 
   async loadItems () {
     this.loading = true
-    const res = await AccountsApi.getUsers(this.account)
-    this.items = res.data
+    this.items = await (new AccountsApi()).getUsers(this.account)
     this.loading = false
   }
 
@@ -119,7 +119,7 @@ export default class UserDataTable extends Vue {
 
   // Actions
 
-  item: UserCreationRequest = this.getNewItem()
+  item: UserCreationRequest | User = this.getNewItem()
   creationDialog: boolean = false
   deleteDialog: boolean = false
 
@@ -146,7 +146,7 @@ export default class UserDataTable extends Vue {
     }
     try {
       this.loading = true
-      await AccountsApi.deleteUser(this.account, this.item)
+      await (new AccountsApi()).deleteUser(this.account, this.item as User)
     } catch (e) {
     }
 
@@ -154,6 +154,5 @@ export default class UserDataTable extends Vue {
     this.loading = false
     this.deleteDialog = false
   }
-
 }
 </script>

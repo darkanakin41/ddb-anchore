@@ -1,12 +1,15 @@
-import { client } from '@/service/axios'
 import Image from '@/model/Image'
 import DeleteImageResponse from '@/model/Request/DeleteImageResponse'
+import _AbstractApi from '@/service/api/_abstractApi'
 
-export default class ImagesApi {
-  static get (id: string): Promise<Image[]> {
-    return client.get(`images/by_id/${id}`)
+export default class ImagesApi extends _AbstractApi {
+  readonly endpoint: string = 'images'
+
+  get (id: string): Promise<Image[]> {
+    return this.sendGet<Image>(`by_id/${id}`)
   }
-  static delete (id: string): Promise<DeleteImageResponse> {
-    return client.delete(`images/by_id/${id}?force=true`)
+
+  delete (id: string): Promise<DeleteImageResponse> {
+    return this.sendDelete<DeleteImageResponse>(`by_id/${id}?force=true`)
   }
 }

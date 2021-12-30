@@ -14,11 +14,13 @@
 /.certs/swagger.anchore.test.key
 /.certs/swagger.anchore.test.crt
 /.docker/node/Dockerfile
+/bin/hadolint
+/.docker/nginx/Dockerfile
+/.docker/nginx/config/nginx.conf
+/.certs/ui.anchore.test.key
+/.certs/ui.anchore.test.crt
 /.bin/conventional-changelog
 /.bin/ncu
 /.bin/npm
 /.bin/vue
-/.certs/ui.anchore.test.key
-/.certs/ui.anchore.test.crt
-/bin/hadolint
 ###< gfi-centre-ouest/docker-devbox ###

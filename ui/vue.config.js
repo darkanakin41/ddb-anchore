@@ -32,7 +32,16 @@ const config = {
     sockPort: settings.sockPort,
     sockPath: settings.sockPath
   },
-  outputDir: path.resolve(__dirname, './tmp')
+  outputDir: path.resolve(__dirname, './dist'),
+
+  chainWebpack: config => {
+    config
+      .plugin('html')
+      .tap(args => {
+        args[0].title = "Anchore UI";
+        return args;
+      })
+  }
 }
 
 module.exports = config

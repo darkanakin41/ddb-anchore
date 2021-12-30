@@ -1,31 +1,33 @@
-import { client } from '@/service/axios'
 import Account from '@/model/Account'
 import AccountCreationRequest from '@/model/Request/AccountCreationRequest'
 import AccountState from '@/model/Request/AccountState'
 import UserCreationRequest from '@/model/Request/UserCreationRequest'
 import User from '@/model/User'
+import _AbstractApi from '@/service/api/_abstractApi'
 
-export default class AccountsApi {
+export default class AccountsApi extends _AbstractApi {
+  readonly endpoint: string = 'accounts'
 
-  static getAll (): Promise<Account[]> {
-    return client.get('accounts')
+  getAll (): Promise<Account[]> {
+    return this.sendGet<Account>('')
   }
 
-  static create (item: AccountCreationRequest): Promise<Account> {
-    return client.post('accounts', item)
+  create (item: AccountCreationRequest): Promise<Account> {
+    return this.sendPost<Account>('', item)
   }
 
-  static get (name: string): Promise<Account> {
-    return client.get(`accounts/${name}`)
+  get (name: string): Promise<Account> {
+    return this.sendGetOne<Account>(name)
   }
 
-  static updateState (account: Account): Promise<AccountState> | void {
+  updateState (account: Account): Promise<AccountState> | void {
     if (account.name === 'admin') {
       return
     }
     if (account.state === 'deleting') {
       return
     }
+    // eslint-disable-next-line
     return new Promise<AccountState>(async () => {
       if (account.state === 'enabled') {
         account.state = 'disabled'
@@ -33,7 +35,7 @@ export default class AccountsApi {
         account.state = 'enabled'
       }
       try {
-        await client.put(`accounts/${account.name}/state`, { state: account.state })
+        return this.sendPut<AccountState>(`${account.name}/state`, { state: account.state })
       } catch (e) {
         if (account.state === 'enabled') {
           account.state = 'disabled'
@@ -44,19 +46,15 @@ export default class AccountsApi {
     })
   }
 
-  static getUsers (account: Account): Promise<User[]> {
-    return client.get(`accounts/${account.name}/users`)
+  getUsers (account: Account): Promise<User[]> {
+    return this.sendGet<User>(`${account.name}/users`)
   }
 
-  static addUser (account: Account, request: UserCreationRequest): Promise<User> {
-    return client.post(`accounts/${account.name}/users`, request)
+  addUser (account: Account, request: UserCreationRequest): Promise<User> {
+    return this.sendPost<User>(`${account.name}/users`, request)
   }
 
-  static deleteUser (account: Account, user: User): void | Promise<void> {
-    if (user.username === 'admin') {
-      return
-    }
-    return client.delete(`accounts/${account.name}/users/${user.username}`)
+  deleteUser (account: Account, user: User): void | Promise<void> {
+    return this.sendDelete(`/${account.name}/users/${user.username}`)
   }
-
 }

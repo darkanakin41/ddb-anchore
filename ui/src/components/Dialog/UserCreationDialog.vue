@@ -53,14 +53,14 @@ export default class UserCreationDialog extends Vue {
   showPassword: boolean = false
 
   passwordRules = [
-    v => !!v || 'Password is required',
-    v => (v.length >= 6 && v.length <= 128) || 'Name must be at least 6 characters, up to 128'
+    (v:string) => !!v || 'Password is required',
+    (v:string) => (v.length >= 6 && v.length <= 128) || 'Name must be at least 6 characters, up to 128'
   ]
 
   async save () {
     this.loading = true
     try {
-      await AccountsApi.addUser(this.account, this.item)
+      await (new AccountsApi()).addUser(this.account, this.item)
     } catch (e) {
       console.error('Une erreur est survenue')
     }

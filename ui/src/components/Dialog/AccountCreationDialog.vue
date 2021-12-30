@@ -46,7 +46,7 @@ export default class AccountCreationDialog extends Vue {
   async save () {
     this.loading = true
     try {
-      await AccountsApi.create(this.item)
+      await (new AccountsApi()).create(this.item)
     } catch (e) {
       console.error('Une erreur est survenue')
     }

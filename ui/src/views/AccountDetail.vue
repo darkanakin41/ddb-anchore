@@ -49,7 +49,7 @@ export default class ImageDetail extends Vue {
 
   async loadItems () {
     this.loading = true
-    this.item = (await AccountsApi.get(this.name)).data
+    this.item = (await (new AccountsApi()).get(this.name))
     this.loading = false
   }
 
@@ -76,11 +76,10 @@ export default class ImageDetail extends Vue {
   }
 
   async updateState () {
-    if(this.item){
-      await AccountsApi.updateState(this.item)
+    if (this.item) {
+      await (new AccountsApi()).updateState(this.item)
     }
   }
-
 }
 </script>
 

@@ -10,5 +10,7 @@ permissions:
     "bin/hadolint": "+x"
 
 core:
+#  env:
+#    current: prod
   domain:
     sub: anchore

@@ -1,0 +1,16 @@
+FROM nginx:1.18-alpine
+LABEL maintainer="Pierre LEJEUNE <darkanakin41@gmail.com>"
+
+RUN apk add --no-cache \
+	curl=7.67.0-r3 \
+	libcrypto1.1=1.1.1j-r0 \
+	libcurl=7.67.0-r3 \
+	libssl1.1=1.1.1j-r0 \
+	musl=1.1.24-r3 \
+	musl-utils=1.1.24-r3
+
+{% if core.env.current == "prod" %}
+RUN mkdir -p /var/www/html/ui
+
+ADD ./ui /var/www/html/ui
+{% endif %}

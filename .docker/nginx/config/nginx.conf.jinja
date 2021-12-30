@@ -1,0 +1,54 @@
+user  nginx;
+worker_processes  1;
+
+events {
+  worker_connections  32;
+}
+
+http {
+  upstream swagger-ui {
+    server swagger-ui:8080;
+    keepalive 64;
+  }
+
+  upstream enterprise-api {
+    server api:8228;
+    keepalive 64;
+  }
+
+  server {
+    listen 8080;
+    listen [::]:8080;
+
+    server_name swagger.{{ core.domain.sub }}.{{ core.domain.ext }};
+
+    location / {
+      proxy_pass http://swagger-ui;
+    }
+
+    location /v1 {
+      proxy_pass http://enterprise-api;
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+      add_header 'Access-Control-Allow-Headers' 'authorization, content-type';
+    }
+  }
+
+  {% if core.env.current == 'prod' %}
+  server {
+    listen 80;
+    listen [::]:80;
+
+    root /var/www/html/ui;
+    index index.html;
+
+    server_name {{ core.domain.sub }}.{{ core.domain.ext }};
+
+    location / {
+      try_files $uri $uri/ /index.html;
+    }
+  }
+  {% endif %}
+}

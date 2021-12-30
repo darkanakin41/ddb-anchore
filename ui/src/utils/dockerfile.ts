@@ -1,4 +1,4 @@
-const DOCKERFILE_COMMANDS = ['FROM', 'CMD', 'ADD', 'ENV', 'COPY', 'WORKDIR', 'LABEL', 'EXPOSE', 'USER', 'ENTRYPOINT', 'RUN', 'MAINTAINER', 'STOPSIGNAL']
+const DOCKERFILE_COMMANDS = ['FROM', 'CMD', 'ADD', 'ENV', 'COPY', 'WORKDIR', 'LABEL', 'EXPOSE', 'USER', 'ENTRYPOINT', 'RUN', 'MAINTAINER', 'STOPSIGNAL', 'VOLUME']
 
 export function formatDockerfile (content: string): string {
   content = content.split('\n').join('<br/>')

@@ -91,12 +91,13 @@ ddb.Compose() {
 		        },
 		        ports: ['8228:8228']
             },
-		'swagger-ui-nginx': ddb.Image("nginx:latest")
+		'web': ddb.Build("nginx")
 		    + ddb.VirtualHost("8080", std.join(".", ["swagger", domain]), "swagger")
+		    + (if std.extVar("core.env.current") == "prod" then ddb.VirtualHost("80", domain, "ui") else {})
 		    + {
 		        depends_on: ['api', 'swagger-ui'],
 		        volumes: [
-		            ddb.path.project + '/swagger-ui.nginx.conf:/etc/nginx/nginx.conf'
+		            ddb.path.project + '/.docker/nginx/config/nginx.conf:/etc/nginx/nginx.conf'
 		        ]
             },
 		'swagger-ui': ddb.Image("swaggerapi/swagger-ui")
@@ -106,7 +107,7 @@ ddb.Compose() {
 		        }
             },
 
-        node: ddb.Build("node")
+        [if std.extVar("core.env.current") != "prod" then 'node']: ddb.Build("node")
             + ddb.User()
             + ddb.Binary("ncu", app_workdir, "ncu",  "--label traefik.enable=false")
             + ddb.Binary("npm", app_workdir, "npm")

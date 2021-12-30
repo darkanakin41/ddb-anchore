@@ -16,11 +16,8 @@
               <template v-if="autoRefreshInterval">
                 Rafraichissement auto dans {{ autoRefreshTimerState }}s
               </template>
-              <v-btn icon @click="deleteImage" v-if="">
+              <v-btn icon @click="deleteImage">
                 <v-icon>mdi-delete-outline</v-icon>
-              </v-btn>
-              <v-btn icon @click="exportPdf">
-                <v-icon>mdi-file-pdf-outline</v-icon>
               </v-btn>
               <v-btn icon @click="loadItems">
                 <v-icon>mdi-refresh</v-icon>
@@ -194,167 +191,6 @@
         </v-col>
       </v-row>
     </v-container>
-    <vue-html2pdf v-if="item && !loading"
-                  :show-layout="false"
-                  :float-layout="false"
-                  :enable-download="true"
-                  :preview-modal="false"
-                  :paginate-elements-by-height="1400"
-                  :filename="item.image_detail[0].repo + ':' + item.image_detail[0].tag"
-                  :pdf-quality="2"
-                  :manual-pagination="false"
-                  pdf-format="a4"
-                  pdf-orientation="landscape"
-                  pdf-content-width="99%"
-                  ref="html2Pdf">
-      <section slot="pdf-content">
-        <page-card :body-padding="false">
-          <template v-slot:title>
-            <v-chip>{{ analysisStatusLabel }}</v-chip>
-            {{ item.image_detail[0].repo }}
-          </template>
-          <v-container fluid>
-            <v-row>
-              <v-col cols="12">
-                <v-simple-table>
-                  <tbody>
-                  <tr>
-                    <td>Image</td>
-                    <td class="font-weight-bold">
-                      {{ item.image_detail[0].registry }}/{{ item.image_detail[0].repo }}:{{
-                        item.image_detail[0].tag
-                      }}
-                    </td>
-                    <td>Status</td>
-                    <td class="font-weight-bold">{{ imageStatusLabel }}</td>
-                    <td>Type</td>
-                    <td class="font-weight-bold">{{ item.image_type }}</td>
-                  </tr>
-                  <tr>
-                    <td>Créer le</td>
-                    <td class="font-weight-bold">{{ formatDate(item.image_detail[0].created_at) }}</td>
-                    <td>Digest</td>
-                    <td class="font-weight-bold" colspan="3">{{ item.imageDigest }}</td>
-                  </tr>
-                  <tr>
-                    <td>OS</td>
-                    <td class="font-weight-bold">{{ baseOs }}</td>
-                    <td>Taille</td>
-                    <td class="font-weight-bold">{{ imageSize }}</td>
-                    <td>Layers</td>
-                    <td class="font-weight-bold">{{ item.image_content.metadata.layer_count }}</td>
-                  </tr>
-                  </tbody>
-                </v-simple-table>
-              </v-col>
-            </v-row>
-          </v-container>
-        </page-card>
-        <page-card :body-padding="false">
-          <template v-slot:title>
-            <v-progress-circular indeterminate size="32" v-if="vulnerabilitiesLoading"/>
-            <v-chip v-if="vulnerabilityResponse" :color="vulnerabilitiesChipColor">
-              {{ vulnerabilityResponse.vulnerabilities.length }}
-            </v-chip>
-            Vulnérabilités
-          </template>
-          <v-row v-if="!vulnerabilitiesLoading">
-            <v-col cols="3" class="text-center">
-              <v-chip :color="getChipColor(distinctVulnerabilities.length)">{{ distinctVulnerabilities.length }}
-                Vulnerabilités Uniques
-              </v-chip>
-            </v-col>
-            <v-col cols="3" class="text-center">
-              <v-chip :color="getChipColor(vulnerabilities.length)">{{ vulnerabilities.length }} Dépendances de
-                Vulnerabilités
-              </v-chip>
-            </v-col>
-            <v-col cols="3" class="text-center">
-              <v-chip :color="getChipColor(distinctDependencies.length)">{{ distinctDependencies.length }}
-                Dépendances
-              </v-chip>
-            </v-col>
-            <v-col cols="3" class="text-center">
-              <v-chip :color="getChipColor(fixableVulnerabilities.length)">{{ fixableVulnerabilities.length }}
-                Corrigeable
-              </v-chip>
-            </v-col>
-          </v-row>
-
-          <v-data-table v-if="vulnerabilities"
-                        :headers="vulnerabilitiesHeaders"
-                        :items="vulnerabilities"
-                        :loading="vulnerabilitiesLoading"
-                        :options="{
-                                page: 1,
-                                itemsPerPage: vulnerabilities.length,
-                                sortBy: ['severity'],
-                                sortDesc: [false],
-                                groupBy: [],
-                                groupDesc: [],
-                                multiSort: false,
-                                mustSort: false
-                              }"
-                        :footer-props="vulnerabilitiesFooterProps"
-                        class="elevation-1"
-                        multi-sort
-          >
-            <template v-slot:item.severity="{ value }">
-              <v-chip :color="vulnerabilitySeverityColor(value)">
-                {{ value }}
-              </v-chip>
-            </template>
-            <template v-slot:item.vuln="{ item }">
-              <a :href="item.url" target="_blank">{{ item.vuln }}</a>
-            </template>
-          </v-data-table>
-        </page-card>
-        <page-card>
-          <template v-slot:title>
-            <v-chip :color="getChipColor(fixableVulnerabilities.length)">
-              {{ fixableVulnerabilities.length }}
-            </v-chip>
-            Correction(s) possible(s)
-          </template>
-          <pre v-html="fixes"/>
-        </page-card>
-        <page-card>
-          <template v-slot:title>
-            Dockerfile
-          </template>
-          <pre v-html="dockerfile"/>
-        </page-card>
-        <page-card :body-padding="false">
-          <template v-slot:title>
-            <v-progress-circular indeterminate size="32" v-if="packagesLoading"/>
-            <v-chip v-else>{{ packages.length }}</v-chip>
-            Packages
-          </template>
-          <v-data-table v-if="packages"
-                        :headers="packagesHeaders"
-                        :items="packages"
-                        :loading="packagesLoading"
-                        :options="{
-                                page: 1,
-                                itemsPerPage: packages.length,
-                                sortBy: ['package'],
-                                sortDesc: [false],
-                                groupBy: [],
-                                groupDesc: [],
-                                multiSort: false,
-                                mustSort: false
-                              }"
-                        :footer-props="packagesFooterProps"
-                        class="elevation-1"
-                        multi-sort
-          >
-            <template v-slot:item.size="{ value }">
-              {{ humanReadableSize(value) }}
-            </template>
-          </v-data-table>
-        </page-card>
-      </section>
-    </vue-html2pdf>
   </div>
 </template>
 
@@ -374,11 +210,10 @@ import { formatDateTimeLong } from '@/utils/date'
 import NvdData from '@/model/NvdData'
 import ContentPackageResponse from '@/model/ContentPackageResponse'
 import ContentPackage from '@/model/ContentPackage'
-import VueHtml2pdf from 'vue-html2pdf'
 import ImagesApi from '@/service/api/ImagesApi'
 
 @Component({
-  components: { PageCard, VueHtml2pdf }
+  components: { PageCard }
 })
 export default class ImageDetail extends Vue {
   @Prop({ required: true })
@@ -395,10 +230,6 @@ export default class ImageDetail extends Vue {
     return getReadableFileSizeString(size)
   }
 
-  exportPdf () {
-    this.$refs.html2Pdf.generatePdf()
-  }
-
   async mounted () {
     await this.loadItems()
   }
@@ -406,8 +237,8 @@ export default class ImageDetail extends Vue {
   async loadItems () {
     try {
       this.loading = true
-      const res = await ImagesApi.get(this.id)
-      this.item = res.data[0]
+      const res = await (new ImagesApi()).get(this.id)
+      this.item = res[0]
       this.loading = false
       this.autoRefreshTimerState = this.autoRefreshTimerInitial
       if (this.item && this.item.analysis_status && this.item.analysis_status !== 'analyzed' && this.item.analysis_status !== 'analysis_failed' && !this.autoRefreshInterval) {
@@ -623,8 +454,23 @@ export default class ImageDetail extends Vue {
     return distinctDependencies
   }
 
-  get fixableVulnerabilities () {
-    return this.vulnerabilities.filter((vuln: Vulnerability) => vuln.fix !== 'None')
+  get fixableVulnerabilities (): Vulnerability[] {
+    const vulneratibilites = this.vulnerabilities.filter((vuln: Vulnerability) => (vuln.fix !== 'None' && vuln.feed_group === this.baseOs))
+    const result: Vulnerability[] = []
+    vulneratibilites.forEach((vul: Vulnerability) => {
+      let vulFix = vul
+      vulneratibilites.filter((a: Vulnerability) => {
+        return a.package_name === vul.package_name
+      }).forEach((vul2: Vulnerability) => {
+        if (vul.fix < vul2.fix) {
+          vulFix = vul2
+        }
+      })
+      if (result.indexOf(vulFix) === -1) {
+        result.push(vulFix)
+      }
+    })
+    return result
   }
 
   get fixes () {
@@ -638,6 +484,7 @@ export default class ImageDetail extends Vue {
 
     switch (this.item.image_content.metadata.distro) {
       case 'debian':
+      case 'ubuntu':
         fixes.push('RUN apt-get update', '&& apt-get install -y --no-install-recommends')
         break
       case 'alpine':
@@ -647,18 +494,19 @@ export default class ImageDetail extends Vue {
 
     this.fixableVulnerabilities.forEach((vuln: Vulnerability) => {
       const fix: string = `${vuln.package_name}=${vuln.fix}`
-      if (fixes.indexOf(fix) === -1) {
+      if (fixes.indexOf(fix) === -1 && vuln.feed_group === this.baseOs) {
         fixes.push(fix)
       }
     })
 
     switch (this.item.image_content.metadata.distro) {
       case 'debian':
+      case 'ubuntu':
         fixes.push('&& rm -rf /var/lib/apt/lists/*')
         break
     }
 
-    return formatDockerfile(fixes.join(' \\\n\t'))
+    return formatDockerfile(fixes.join(' \\\n\t').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;'))
   }
 
   packagesLoading: boolean = false
@@ -705,7 +553,7 @@ export default class ImageDetail extends Vue {
       return
     }
 
-    const res = await ImagesApi.delete(this.id)
+    const res = await (new ImagesApi()).delete(this.id)
     await this.mounted()
   }
 
@@ -734,9 +582,5 @@ export default class ImageDetail extends Vue {
 <style lang="scss" scoped>
 pre {
   white-space: normal;
-}
-
-.vue-html2pdf::v-deep {
-  display: none;
 }
 </style>

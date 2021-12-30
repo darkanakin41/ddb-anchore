@@ -84,8 +84,7 @@ export default class AccountList extends Vue {
 
   async loadItems () {
     this.loading = true
-    const res = await AccountsApi.getAll()
-    this.items = res.data
+    this.items = await (new AccountsApi()).getAll()
     this.loading = false
   }
 
@@ -144,7 +143,7 @@ export default class AccountList extends Vue {
   }
 
   async updateState (item: Account) {
-    await AccountsApi.updateState(item)
+    await (new AccountsApi()).updateState(item)
   }
 
   accountState = ACCOUNT_STATE
